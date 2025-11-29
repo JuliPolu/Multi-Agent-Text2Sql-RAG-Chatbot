@@ -1,24 +1,5 @@
 # Building an Intelligent Text-to-SQL Multi-Agent Chatbot with LangGraph and Chainlit
 
-![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
-![LangGraph](https://img.shields.io/badge/LangGraph-1.0.3-green.svg)
-![Chainlit](https://img.shields.io/badge/Chainlit-2.9.0-orange.svg)
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-
-> *Transforming Natural Language Questions into Actionable Database Insights Using Multi-Agent Architecture*
-
----
-
-Read the full medium article here: [Agentic AI Project: Build Multi-Agent Text2SQL Chatbot for Ecommerce Database
-](https://medium.com/towards-artificial-intelligence/agentic-ai-project-build-multi-agent-text2sql-chatbot-for-ecommerce-database-c8d0e294ec94)
-
-
-
-https://github.com/user-attachments/assets/4e1988b2-b131-4421-bbd4-38eaecaaae38
-
-
-
-
 ## 📚 Table of Contents
 
 - [Introduction](#-introduction)
