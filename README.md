@@ -83,6 +83,15 @@ A conversational AI system that:
 ### Utilities
 - **[python-dotenv 1.2.1](https://github.com/theskumar/python-dotenv)** - Environment variable management
 
+### Local Inference & RAG
+- **[vLLM](https://github.com/vllm-project/vllm)** - High-throughput and memory-efficient LLM inference
+- **[ChromaDB](https://www.trychroma.com/)** - AI-native open-source embedding database
+- **[Qwen2.5](https://huggingface.co/Qwen)** - State-of-the-art open local model
+
+### Observability
+- **[Langfuse](https://langfuse.com/)** - Open source LLM engineering platform
+- **[Arize Phoenix](https://phoenix.arize.com/)** - AI observability & evaluation
+
 ---
 
 ## 🏗️ System Architecture
@@ -129,13 +138,14 @@ A conversational AI system that:
 
 1. **User Input** → Natural language question via Chainlit UI
 2. **Guardrails Check** → Validate scope and detect greetings
-3. **SQL Generation** → Convert to SQLite query using schema context
-4. **Execution** → Run query against database
-5. **Error Handling** → Retry with corrections if needed (max 3 attempts)
-6. **Analysis** → Convert results to natural language
-7. **Visualization Decision** → Determine if graph would add value
-8. **Graph Generation** → Create interactive Plotly visualization
-9. **Response** → Stream back to user with expandable steps
+3. **Routing** → Direct to SQL Agent (Database) or RAG Agent (Docs)
+4. **SQL Generation/Retrieval** → Generate SQL or fetch relevant docs
+5. **Execution** → Run query against database
+6. **Error Handling** → Retry with corrections if needed
+7. **Analysis** → Convert results to natural language
+8. **Visualization Decision** → Determine if graph would add value
+9. **Graph Generation** → Create interactive Plotly visualization
+10. **Response** → Stream back to user with expandable steps
 
 ---
 
@@ -332,6 +342,52 @@ customers ←→ orders ←→ order_items ←→ products
 
 ---
 
+### 10. **RAG Agent** 📚
+**Role**: Documentation Expert
+
+**Responsibilities**:
+- Answers questions about the "Vision" browser automation tool
+- Retrieves relevant context from local markdown documentation
+- Deduplicates sources and provides citations
+- Uses vector similarity search for accurate retrieval
+
+**Tech Stack**:
+- **ChromaDB**: Vector storage
+- **OpenAI/HuggingFace Embeddings**: Semantic search
+- **Recursive Splitting**: Smart document chunking
+
+---
+
+### 11. **Local Inference Manager** 🏠
+**Role**: LLM Orchestrator
+
+**Responsibilities**:
+- Manages local vLLM instance (Qwen/Qwen3-8B-AWQ)
+- Provides OpenAI-compatible interface
+- Handles automatic fallback to OpenAI API if local model fails
+- Optimizes GPU memory usage
+
+**Key Features**:
+- **Hybrid Mode**: Local speed + Cloud reliability
+- **Quantization**: AWQ 4-bit quantization for efficiency
+- **Chat Templates**: Automatic prompt formatting
+
+---
+
+### 12. **Monitoring System** 🔭
+**Role**: System Observer
+
+**Responsibilities**:
+- Traces agent execution paths
+- Collects performance metrics (latency, token usage)
+- Integrates with external observability platforms
+
+**Integrations**:
+- **Langfuse**: Detailed trace visualization and cost tracking
+- **Arize Phoenix**: Evaluation and troubleshooting
+
+---
+
 ## ✨ Key Features
 
 ### 1. **Conversational Interface**
@@ -369,6 +425,16 @@ customers ←→ orders ←→ order_items ←→ products
 - Error boundaries
 - Output truncation
 - Recursion limits
+
+### 7. **Hybrid Inference**
+- **Local First**: Prioritizes local vLLM for privacy and cost
+- **Cloud Fallback**: Seamlessly switches to OpenAI API
+- **Model Flexibility**: Supports various quantized models
+
+### 8. **Full Observability**
+- **Traceability**: Track every step of the agent workflow
+- **Debuggability**: Deep dive into agent decisions
+- **Performance**: Monitor latency and resource usage
 
 ---
 
@@ -416,6 +482,19 @@ echo "OPENAI_API_KEY=your_openai_api_key_here" > .env
 ```
 
 Replace `your_openai_api_key_here` with your actual OpenAI API key from [platform.openai.com](https://platform.openai.com/api-keys).
+
+### Optional: Monitoring Configuration
+To enable observability, add these to your `.env`:
+
+```bash
+# Langfuse
+LANGFUSE_PUBLIC_KEY=pk-lf-...
+LANGFUSE_SECRET_KEY=sk-lf-...
+LANGFUSE_HOST=https://cloud.langfuse.com
+
+# Phoenix
+PHOENIX_COLLECTOR_ENDPOINT=http://localhost:6006/v1/traces
+```
 
 ### Step 5: Initialize Database
 
@@ -516,7 +595,10 @@ graph TD
     B --> C{In Scope?}
     
     C -->|No| D[END]
-    C -->|Yes| E[SQL Agent]
+    C -->|Yes| R{Router}
+    
+    R -->|Database| E[SQL Agent]
+    R -->|Docs| RA[RAG Agent]
     
     E --> F[Execute SQL]
     
@@ -529,6 +611,10 @@ graph TD
     I -->|No| K[Error Agent]
     
     K --> F
+    
+    RA --> V[(Vector DB)]
+    V --> RA
+    RA --> D
     
     J --> L[Viz Decision Agent]
     
@@ -730,43 +816,3 @@ pip install -r requirements-dev.txt
 
 ---
 
-## 📄 License
-
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🙏 Acknowledgments
-
-- **[LangChain Team](https://github.com/langchain-ai)** - For LangGraph framework
-- **[Chainlit Team](https://github.com/Chainlit)** - For the amazing UI framework
-- **[OpenAI](https://openai.com/)** - For GPT-4 model
-- **[Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)** - For the Brazilian e-commerce dataset
-- **Open Source Community** - For the incredible tools and libraries
-
----
-
-## 📞 Contact & Support
-
-- **Author**: [Vijendra](https://github.com/alphaiterations)
-- **Repository**: [multi-agent-chatbot](https://github.com/alphaiterations/multi-agent-chatbot)
-- **Issues**: [GitHub Issues](https://github.com/alphaiterations/multi-agent-chatbot/issues)
-
----
-
-## 📈 Project Stats
-
-![GitHub stars](https://img.shields.io/github/stars/alphaiterations/multi-agent-chatbot?style=social)
-![GitHub forks](https://img.shields.io/github/forks/alphaiterations/multi-agent-chatbot?style=social)
-![GitHub issues](https://img.shields.io/github/issues/alphaiterations/multi-agent-chatbot)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/alphaiterations/multi-agent-chatbot)
-
----
-
-<div align="center">
-
-**Built with ❤️ using LangGraph and Chainlit**
-
-⭐ **Star this repo if you found it helpful!** ⭐
-
-</div>
