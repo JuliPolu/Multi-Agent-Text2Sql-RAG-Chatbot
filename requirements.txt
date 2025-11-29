@@ -1,0 +1,33 @@
+# Core dependencies
+langgraph==1.0.3
+chainlit==2.9.0
+openai==2.8.0
+
+# Data and database
+pandas==2.3.3
+# sqlite3
+
+# Visualization
+plotly==6.4.0
+
+# Utilities
+python-dotenv==1.2.1
+
+langchain
+langchain-community
+langchain-openai
+chromadb
+tiktoken
+
+# Local Inference (vLLM)
+vllm==0.5.4
+torch==2.4.0
+transformers>=4.43.2
+accelerate>=0.25.0
+sentence-transformers==2.2.2
+
+# Monitoring
+langfuse==2.20.0
+arize-phoenix==4.5.0
+opentelemetry-api==1.21.0
+opentelemetry-sdk==1.21.0
