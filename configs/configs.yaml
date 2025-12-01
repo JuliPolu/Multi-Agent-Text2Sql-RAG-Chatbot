@@ -1,0 +1,129 @@
+llm:
+  model_path: "Qwen/Qwen3-8B-AWQ"
+  quantization: "awq"
+  gpu_memory_utilization: 0.8
+  # max_model_len: 32768
+  max_model_len: 16384
+  # max_model_len: 8192
+  trust_remote_code: true
+  enforce_eager: true
+  enable_thinking: false
+  enable_openai_fallback: true
+  openai_model: "gpt-4o-mini"
+
+rag:
+  docs_dir: "../docs_Vision"
+  vector_store_dir: "../data/chroma_db"
+  collection_name: "vision_docs"
+  chunk_size: 1000
+  chunk_overlap: 200
+  embeddings_model_openai: "text-embedding-3-small"
+  embeddings_model_hf: "all-MiniLM-L6-v2"
+
+database:
+  path: "../data/ecommerce.db"
+  schema_info: |
+    Database Schema for E-commerce System:
+
+    1. customers
+       - customer_id (TEXT): Unique customer identifier
+       - customer_unique_id (TEXT): Unique customer identifier across datasets
+       - customer_zip_code_prefix (INTEGER): Customer zip code
+       - customer_city (TEXT): Customer city
+       - customer_state (TEXT): Customer state
+
+    2. orders
+       - order_id (TEXT): Unique order identifier
+       - customer_id (TEXT): Foreign key to customers
+       - order_status (TEXT): Order status (delivered, shipped, etc.)
+       - order_purchase_timestamp (TEXT): When the order was placed
+       - order_approved_at (TEXT): When payment was approved
+       - order_delivered_carrier_date (TEXT): When order was handed to carrier
+       - order_delivered_customer_date (TEXT): When customer received the order
+       - order_estimated_delivery_date (TEXT): Estimated delivery date
+
+    3. order_items
+       - order_id (TEXT): Foreign key to orders
+       - order_item_id (INTEGER): Item sequence number within order
+       - product_id (TEXT): Foreign key to products
+       - seller_id (TEXT): Foreign key to sellers
+       - shipping_limit_date (TEXT): Shipping deadline
+       - price (REAL): Item price
+       - freight_value (REAL): Shipping cost
+
+    4. order_payments
+       - order_id (TEXT): Foreign key to orders
+       - payment_sequential (INTEGER): Payment sequence number
+       - payment_type (TEXT): Payment method (credit_card, boleto, etc.)
+       - payment_installments (INTEGER): Number of installments
+       - payment_value (REAL): Payment amount
+
+    5. order_reviews
+       - review_id (TEXT): Unique review identifier
+       - order_id (TEXT): Foreign key to orders
+       - review_score (INTEGER): Review score (1-5)
+       - review_comment_title (TEXT): Review title
+       - review_comment_message (TEXT): Review message
+       - review_creation_date (TEXT): When review was created
+       - review_answer_timestamp (TEXT): When review was answered
+
+    6. products
+       - product_id (TEXT): Unique product identifier
+       - product_category_name (TEXT): Product category (in Portuguese)
+       - product_name_lenght (REAL): Product name length
+       - product_description_lenght (REAL): Product description length
+       - product_photos_qty (REAL): Number of product photos
+       - product_weight_g (REAL): Product weight in grams
+       - product_length_cm (REAL): Product length in cm
+       - product_height_cm (REAL): Product height in cm
+       - product_width_cm (REAL): Product width in cm
+
+    7. sellers
+       - seller_id (TEXT): Unique seller identifier
+       - seller_zip_code_prefix (INTEGER): Seller zip code
+       - seller_city (TEXT): Seller city
+       - seller_state (TEXT): Seller state
+
+    8. geolocation
+       - geolocation_zip_code_prefix (INTEGER): Zip code prefix
+       - geolocation_lat (REAL): Latitude
+       - geolocation_lng (REAL): Longitude
+       - geolocation_city (TEXT): City name
+       - geolocation_state (TEXT): State code
+
+    9. product_category_name_translation
+       - product_category_name (TEXT): Category name in Portuguese
+       - product_category_name_english (TEXT): Category name in English
+
+agent:
+  guardrails:
+    role: "Router and Scope Manager"
+    system_prompt: "You are a router system for a chatbot that has access to two data sources: 1) An E-commerce Database (SQL) and 2) Vision Browser Documentation (RAG). Your job is to route the user's question to the correct agent."
+  sql:
+    role: "SQL Expert"
+    system_prompt: "You are a senior SQL developer specializing in e-commerce databases. Generate only valid SQLite queries without any formatting or explanation."
+  analysis:
+    role: "Data Analyst"
+    system_prompt: "You are a helpful data analyst that explains database query results in natural language with clear insights."
+  viz:
+    role: "Visualization Specialist"
+    system_prompt: "You are a data visualization expert. Generate clean, executable Plotly code without any markdown formatting or explanations."
+  error:
+    role: "Error Recovery Specialist"
+    system_prompt: "You diagnose and fix SQL errors with expert knowledge of database schemas and query optimization."
+
+app:
+  welcome_message: |
+    👋 Welcome to the Multi-Agent Assistant!
+
+    I can help you with two main tasks:
+    1. **E-commerce Data Analysis** (SQL): Query the database about orders, customers, products, etc.
+    2. **Vision Browser Support** (RAG): Answer questions from the Vision documentation.
+
+    **Example questions:**
+    - *SQL*: How many orders were delivered?
+    - *SQL*: What are the top 5 product categories by sales?
+    - *RAG*: How do I create a profile in Vision?
+    - *RAG*: What is video spoofing?
+
+    Go ahead and ask me anything! 🚀
