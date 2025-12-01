@@ -3,9 +3,10 @@ import sqlite3
 import os
 
 # Path to local data folder
-data_path = "data"
-
-db = "ecommerce.db"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(script_dir)
+data_path = os.path.join(project_root, "data", "e-com_db_csv")
+db = os.path.join(project_root, "data", "ecommerce.db")
 if os.path.exists(db):
     os.remove(db)
 
